@@ -32,6 +32,8 @@ nav {
   border-radius: 50px;
   transition: all 0.2s ease-in-out;
 }
+
+.home.focused,
 .home:hover {
   background-color: var(--clr-dark);
   color: white;

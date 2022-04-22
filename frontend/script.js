@@ -7,9 +7,13 @@ const password = document.querySelector('#password');
 const repeatPassword = document.querySelector('#repeat-password');
 const rememberMe = document.querySelector('#remember-me');
 const imgUpload = document.querySelector('#img-upload');
+const home = document.querySelector('.home');
 const avatarContainer = document.querySelector('.avatar-container');
 let user = null;
 window.onload = () => {
+  if (window.location.href.includes('index.html')) {
+    home.classList.add('focused');
+  }
   user = JSON.parse(localStorage.getItem('user')) || null;
   if (avatarContainer) {
     if (user?.profilePicURL) {
