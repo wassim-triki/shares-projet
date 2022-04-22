@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="./styles.css" />
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/js/all.min.js"
+      integrity="sha512-6PM0qYu5KExuNcKt5bURAoT6KCThUmHRewN3zUFNaoI6Di7XJPTMoT6K0nsagZKk2OB4L7E3q1uQKHNHd4stIQ=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    ></script>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css"
+      integrity="sha512-KfkfwYDsLkIlwQp6LFnl8zNdLGxu9YAA1QvwINks4PhcElQSvqcyVLLD9aMhXd13uQjoXtEKNosOWaZqXgel0g=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+    <title>Document</title>
+  </head>
+  <body>
+    <form class="form">
+      <input
+        type="text"
+        name="username"
+        id="username"
+        required
+        placeholder="Username"
+      />
+      <input
+        type="password"
+        name="password"
+        id="password"
+        placeholder="Passowrd"
+        required
+      />
+      <label for="remember-me" class="container">
+        <input type="checkbox" name="remember-me" id="remember-me" /><span
+          >Remember me</span
+        >
+        <span class="mark"></span>
+      </label>
+      <button id="signin" type="submit" name="submit">Sign in</button>
+      <p>Don't have an account? <a href="./signup.html">Sign up</a></p>
+    </form>
+    <div class="alerts"></div>
+    <script src="./script.js" type="module"></script>
+  </body>
+</html>

@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="./styles.css" />
+
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/js/all.min.js"
+      integrity="sha512-6PM0qYu5KExuNcKt5bURAoT6KCThUmHRewN3zUFNaoI6Di7XJPTMoT6K0nsagZKk2OB4L7E3q1uQKHNHd4stIQ=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    ></script>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css"
+      integrity="sha512-KfkfwYDsLkIlwQp6LFnl8zNdLGxu9YAA1QvwINks4PhcElQSvqcyVLLD9aMhXd13uQjoXtEKNosOWaZqXgel0g=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+    <title>Document</title>
+  </head>
+  <body>
+    <form class="form">
+      <label for="username" class="label">
+        <input
+          type="text"
+          name="username"
+          id="username"
+          required
+          placeholder="Username"
+        />
+        <ul class="username-conditions">
+          <li>* must not start with a number</li>
+          <li>* must be longer than 3 characters</li>
+          <li>* must be shorter than 30 characters</li>
+          <li>* must not contain any special characters, only [ - , _ ]</li>
+        </ul>
+      </label>
+      <label for="password" class="label">
+        <input
+          type="password"
+          name="password"
+          id="password"
+          required
+          placeholder="Passowrd"
+        />
+        <ul class="password-conditions">
+          <li>* must be alphanumeric</li>
+          <li>* must be longer than 5 characters</li>
+        </ul>
+      </label>
+
+      <input
+        type="password"
+        name="repeat-password"
+        id="repeat-password"
+        required
+        placeholder="Repeat password"
+      />
+      <label for="remember-me" class="container">
+        <input type="checkbox" name="remember-me" id="remember-me" /><span
+          >Remember me</span
+        >
+        <span class="mark"></span>
+      </label>
+      <input type="file" id="img-upload" accept="image/*" />
+      <label id="img-upload-custom" for="img-upload">
+        <i class="fa-solid fa-upload"></i>
+        <span id="upload-text">Profile Picture</span>
+      </label>
+      <button id="signup" type="submit" name="submit">Sign up</button>
+      <p>Already have an account? <a href="./login.html">Sign in</a></p>
+    </form>
+    <!-- The actual snackbar -->
+    <div class="alerts"></div>
+    <script src="./firebase.js" type="module"></script>
+    <script src="./script.js" type="module"></script>
+  </body>
+</html>

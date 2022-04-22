@@ -1,0 +1,272 @@
+@import './root.css';
+body {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  font-family: sans-serif;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  padding: 2rem;
+  border-radius: 8px;
+  box-shadow: 0 0 30px 0px rgba(0, 0, 0, 0.1);
+  gap: 1rem;
+  width: 400px;
+}
+.container {
+  display: flex;
+  align-items: center;
+  color: var(--clr-dark);
+  gap: 0.2rem;
+}
+input {
+  padding: 0.6rem;
+  border: none;
+  border: 2px solid var(--clr-dark);
+  border-radius: 5px;
+  font-size: medium;
+  outline: none;
+  transition: all 0.2s ease-in-out;
+}
+input::placeholder {
+  color: gray;
+  font-weight: 400;
+}
+input:focus {
+  border-color: rgb(0, 133, 228);
+}
+
+button[type='submit'] {
+  background-color: var(--clr-dark);
+  color: white;
+  border: none;
+  padding: 0.8rem;
+  border-radius: 5px;
+  /* font-size: medium; */
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+}
+button[type='submit']:hover {
+  background-color: #393c45;
+}
+p {
+  color: gray;
+  font-size: small;
+}
+p a {
+  color: var(--clr-dark);
+  font-weight: 600;
+}
+
+.container {
+  display: block;
+  position: relative;
+  padding-left: 15px;
+  /* margin-bottom: 20px; */
+  cursor: pointer;
+  font-size: 25px;
+}
+
+/* Hide the default checkbox */
+.container input {
+  visibility: hidden;
+  cursor: pointer;
+}
+.container span {
+  font-size: medium;
+}
+
+/* Create a custom checkbox */
+.mark {
+  position: absolute;
+  top: 9px;
+  left: 0;
+  height: 20px;
+  width: 20px;
+  background-color: transparent;
+  border: 2px solid var(--clr-dark);
+  border-radius: 5px;
+}
+
+.container:hover input ~ .mark {
+  /* background-color: gray; */
+}
+
+.container input:checked ~ .mark {
+  background-color: var(--clr-dark);
+}
+
+/* Create the mark/indicator (hidden when not checked) */
+.mark:after {
+  content: '';
+  position: absolute;
+  display: none;
+}
+
+/* Show the mark when checked */
+.container input:checked ~ .mark:after {
+  display: block;
+}
+
+/* Style the mark/indicator */
+.container .mark:after {
+  top: 12%;
+  left: 35%;
+  /* transform: translate(-50%, -50%); */
+  width: 5px;
+  height: 10px;
+  border: solid white;
+  border-width: 0 3px 3px 0;
+  transform: rotate(45deg);
+}
+
+.username-conditions,
+.password-conditions {
+  display: none;
+  transition: all 0.2s ease-in-out;
+}
+input[name='username']:focus + .username-conditions,
+input[name='password']:focus + .password-conditions {
+  display: block;
+}
+.username-conditions li,
+.password-conditions li {
+  list-style: none;
+  font-size: small;
+  color: gray;
+}
+
+.label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+/* The alert - position it at the bottom and in the middle of the screen */
+#alert {
+  visibility: hidden; /* Hidden by default. Visible on click */
+  min-width: 250px; /* Set a default minimum width */
+  margin-left: -125px; /* Divide value of min-width by 2 */
+  background-color: var(--clr-dark); /* Black background color */
+  color: #fff; /* White text color */
+  text-align: center; /* Centered text */
+  border-radius: 5px; /* Rounded borders */
+  padding: 16px; /* Padding */
+  position: fixed; /* Sit on top of the screen */
+  z-index: 1; /* Add a z-index if needed */
+  left: 50%; /* Center the alert */
+  bottom: 30px; /* 30px from the bottom */
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+#alert > .fa-circle-check {
+  font-size: 1.5rem;
+  color: var(--clr-success);
+}
+#alert > .fa-circle-exclamation {
+  font-size: 1.5rem;
+  color: var(--clr-danger);
+}
+#alert > p {
+  font-size: medium;
+  color: white;
+  text-align: center;
+  margin-left: auto;
+  margin-right: auto;
+}
+.alerts {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+/* Show the alert when clicking on a button (class added with JavaScript) */
+#alert.show {
+  visibility: visible; /* Show the alert */
+  /* Add animation: Take 0.5 seconds to fade in and out the alert.
+  However, delay the fade out process for 2.5 seconds */
+  -webkit-animation: fadein 0.5s, fadeout 0.5s 2.5s;
+  animation: fadein 0.5s, fadeout 0.5s 2.5s;
+}
+
+/* Animations to fade the alert in and out */
+@-webkit-keyframes fadein {
+  from {
+    bottom: 0;
+    opacity: 0;
+  }
+  to {
+    bottom: 30px;
+    opacity: 1;
+  }
+}
+
+@keyframes fadein {
+  from {
+    bottom: 0;
+    opacity: 0;
+  }
+  to {
+    bottom: 30px;
+    opacity: 1;
+  }
+}
+
+@-webkit-keyframes fadeout {
+  from {
+    bottom: 30px;
+    opacity: 1;
+  }
+  to {
+    bottom: 0;
+    opacity: 0;
+  }
+}
+
+@keyframes fadeout {
+  from {
+    bottom: 30px;
+    opacity: 1;
+  }
+  to {
+    bottom: 0;
+    opacity: 0;
+  }
+}
+
+.main {
+  width: 50%;
+  box-shadow: 0 0 30px 0px rgba(0, 0, 0, 0.1);
+  border-radius: 5px;
+  background: #000;
+}
+
+#img-upload {
+  display: none;
+}
+#img-upload-custom {
+  width: 100%;
+  border: 2px dashed var(--clr-gray-normal);
+  padding: 3rem;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  justify-content: center;
+  cursor: pointer;
+  color: var(--clr-gray-dark);
+  gap: 0.5rem;
+}
+#img-upload-custom svg {
+  font-size: 1.5rem;
+}
+#upload-text {
+  white-space: nowrap;
+  text-align: center;
+  width: 90%;
+  overflow: hidden;
+}
