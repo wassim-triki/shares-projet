@@ -4,9 +4,9 @@ include_once "./db.php";
 header("Access-Control-Allow-Origin: *");
 header("Access-Control-Allow-Headers: Origin, X-Requested-With, Content-Type, Accept");
 
-function signin($connection){
+function login($connection){
   $data=json_decode( file_get_contents('php://input'));
-  $result =mysqli_query($connection,"SELECT username,profilePicURL,joinedAt,points FROM users WHERE username='$data->username' AND password='$data->password'");
+  $result =mysqli_query($connection,"SELECT username,profilePicURL,joinedAt,fame FROM users WHERE username='$data->username' AND password='$data->password'");
   // var_dump($result);
   if($result->num_rows===1){
     while($r=mysqli_fetch_assoc($result)){
@@ -20,5 +20,5 @@ function signin($connection){
   }
 }
 if($_SERVER["REQUEST_METHOD"]=="POST"){
-  signin($connection);
+  login($connection);
 }

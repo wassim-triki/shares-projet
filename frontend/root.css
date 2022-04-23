@@ -13,6 +13,8 @@
   --clr-gray: rgb(238, 238, 238);
   --clr-accent: #2176ae;
   --clr-accent-light: #52a1d6;
+  --clr-accent-lightest: #d6edfc;
+
   --clr-variant: #18b64c;
   --clr-variant-light: #22da5f;
   --clr-gray-normal: #cccccc;
@@ -22,6 +24,7 @@
   --clr-danger: rgb(252, 80, 80);
   --clr-danger: rgb(252, 80, 80);
   --clr-danger-light: #fe6e6e;
+  --clr-danger-lightest: #ffdddd;
 }
 
 #alert {

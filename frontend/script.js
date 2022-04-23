@@ -36,6 +36,13 @@ function isDescendant(parent, child) {
 //   user = JSON.parse(localStorage.getItem('user')) || null;
 //   console.log(user);
 // });
+let likes = null;
+const fetchLikes = async () => {
+  const response = await fetch('http://localhost:8000/likes.php');
+  const likes = await response.json();
+  return likes;
+};
+
 window.addEventListener('DOMContentLoaded', async (event) => {
   if (location.href.includes('/index.html')) {
     user = JSON.parse(localStorage.getItem('user'));
@@ -51,6 +58,39 @@ window.addEventListener('DOMContentLoaded', async (event) => {
     loggedinUser = userData;
     fame.innerHTML = `${loggedinUser.fame} fame`;
     usernameP.innerHTML = loggedinUser.username;
+    likes = await fetchLikes();
+    console.log(likes);
+    console.log(posts);
+    posts.forEach((p) => {
+      const likeBtn = document.querySelector(`#${p.postId}`);
+      likeBtn.innerHTML = `<i class="fa-regular fa-thumbs-up"></i>`;
+    });
+    likes.forEach((l) => {
+      const likesSpan = document.querySelector(
+        `#${l.postId}`
+      ).nextElementSibling;
+      likesSpan.innerHTML = l.likes;
+
+      // console.log(likeBtn);
+      // console.log(likesSpan);
+      // const liked = await isLiked(l.postId);
+      // if (liked) {
+      //   const likeIcon = document.querySelector(
+      //     `#${l.postId}`
+      //   ).firstElementChild;
+      //   likeIcon.classList.replace('fa-regular', 'fa-Solid');
+      // }
+    });
+
+    const promises = [];
+    likes.forEach((l) => promises.push(isLiked(l.postId)));
+    const results = await Promise.all(promises);
+    const likedPosts = likes.filter((l, i) => results[i]);
+
+    likedPosts.forEach((l) => {
+      const likeBtn = document.querySelector(`#${l.postId}`);
+      likeBtn.innerHTML = `<i class="fa-solid fa-thumbs-up"></i>`;
+    });
   }
 
   if (userDiv) {
@@ -95,9 +135,9 @@ const createPostElem = (post) => {
   <div class="post-header">
     <div class="post-profile-pic-container">
     ${
-      post.profilePicUrl
+      post.profilePicURL
         ? `<img
-    src="${post.profilePicUrl}"
+    src="${post.profilePicURL}"
   />`
         : '<i class="fa-solid fa-user"></i>'
     }
@@ -120,6 +160,19 @@ ${
   src="${post.imageURL}"
 />`
 }
+<div class="social">
+  <div class="social-icon">
+  <button type="button" class="social-btn like"  id="${post.postId}">
+    </button>
+  <span class="likes" id="${post.postId}">0</span>
+  </div>
+  <div class="social-icon">
+  <button type="button" class="social-btn  dislike" id="${post.postId}">
+    <i class="fa-regular fa-thumbs-down"></i>
+  </button>
+    <span class="dislikes" id="${post.postId}">0</span>
+  </div>
+</div>
 <div class="post-dropdown">
     <div class="post-dropdown-item edit" id="${post.postId}">
     <i class="fa-solid fa-pen-to-square" ></i> Edit
@@ -220,12 +273,51 @@ const editPost = (id) => {
     savePost(post);
   });
 };
-
+const isLiked = async (postId) => {
+  const username = loggedinUser.username;
+  const data = {
+    postId,
+    username,
+  };
+  try {
+    const response = await fetch('http://localhost:8000/likes.php', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data),
+    });
+    const resp = await response.text();
+    const liked = parseInt(resp) > 0;
+    return liked;
+  } catch (err) {
+    showAlert(err.message, false);
+  }
+};
+const likePost = async (id) => {
+  try {
+    const liked = await isLiked(id);
+    if (liked) {
+      //remove like
+    } else {
+      //add like
+    }
+  } catch (err) {
+    showAlert(err.message, false);
+  }
+};
 window.onload = async () => {
   if (window.location.href.includes('index.html')) {
     const data = await getPosts();
     posts = data;
+    console.log(posts);
     renderPosts(posts);
+    const likes = document.querySelectorAll('.like');
+    for (let i = 0; i < likes.length; i++) {
+      likes[i].addEventListener('click', (e) => {
+        likePost(likes[i].id);
+      });
+    }
     const trash = document.querySelectorAll('.trash');
     const edit = document.querySelectorAll('.edit');
     const postDropdown = document.querySelectorAll('.post-dropdown');
@@ -259,8 +351,8 @@ window.onload = async () => {
     });
   }
   if (avatarContainer) {
-    if (loggedinUser?.profilePicUrl) {
-      avatarContainer.innerHTML = `<img src="${loggedinUser.profilePicUrl}"/>`;
+    if (loggedinUser?.profilePicURL) {
+      avatarContainer.innerHTML = `<img src="${loggedinUser.profilePicURL}"/>`;
     } else {
       avatarContainer.innerHTML = `<i class="fa-solid fa-user"></i>`;
     }
@@ -432,9 +524,11 @@ const signinUser = async (e) => {
       body: JSON.stringify(data),
     });
     responseStatus = response.status;
-    const resp = await response.text();
+    console.log(response);
     if (responseStatus == 500 || responseStatus == 300)
       throw new Error(JSON.parse(resp).message);
+
+    const resp = await response.text();
     user = JSON.parse(resp);
     localStorage.setItem('user', JSON.stringify({ username: user.username }));
     setTimeout(() => {
