@@ -59,11 +59,14 @@
           name="post"
           id="post"
           placeholder="What's on your mind?"
-          class="one"
+          class="post-text"
         ></textarea>
+        <div class="post-img-container">
+          <img src="" />
+        </div>
         <div class="extra">
-          <input type="file" id="img-upload" accept="image/*" />
-          <label class="icon-container" for="img-upload">
+          <input type="file" id="img-post-upload" accept="image/*" />
+          <label class="icon-container" for="img-post-upload">
             <i class="fa-solid fa-image"></i>
           </label>
           <div type="button" class="icon-container emoji-picker">
@@ -73,8 +76,36 @@
         <div id="hr"></div>
         <button class="share-btn">Share</button>
       </div>
-    </main>
+      <div class="posts">
+        <div class="post">
+          <!-- <div class="post-info">
+            <div class="post-header">
+              <div class="post-profile-pic-container">
+                <img
+                  src="https://firebasestorage.googleapis.com/v0/b/shares-ae9e0.appspot.com/o/knockups%2FprofilePic.jpg?alt=media&token=d5a0acd4-916e-48ac-bb4e-42ed8b0eec8b"
+                />
+              </div>
+              <div class="post-header-text">
+                <p class="post-user">knockups</p>
+                <span class="post-date">2022-04-23 05:31</span>
+              </div>
+            </div>
 
+            <p class="post-text">
+              Lorem Ipsum is simply dummy text of the printing and typesetting
+              industry.
+            </p>
+          </div>
+
+          <div class="post-image-container">
+            <img
+              src="https://firebasestorage.googleapis.com/v0/b/shares-ae9e0.appspot.com/o/knockups%2Fposts%2Ftugyqmhcfp.jgp?alt=media&token=194f66ea-3ecd-445d-ad7c-7df8f7cf80de"
+            />
+          </div> -->
+        </div>
+      </div>
+    </main>
+    <div class="alerts"></div>
     <script src="./script.js" type="module"></script>
   </body>
 </html>

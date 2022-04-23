@@ -6,14 +6,33 @@ const username = document.querySelector('#username');
 const password = document.querySelector('#password');
 const repeatPassword = document.querySelector('#repeat-password');
 const rememberMe = document.querySelector('#remember-me');
-const imgUpload = document.querySelector('#img-upload');
 const home = document.querySelector('.home');
+const imgUpload = document.querySelector('#img-upload');
+const imgPostUpload = document.querySelector('#img-post-upload');
 const avatarContainer = document.querySelector('.avatar-container');
 const points = document.querySelector('.points');
 const usernameP = document.querySelector('.username');
 const dropdown = document.querySelector('.dropdown');
 const userDiv = document.querySelector('.user');
+const share = document.querySelector('.share-btn');
+const postText = document.querySelector('.post-text');
+
+const postPoints = 5;
 let user = null;
+
+const p = {
+  createdAt: '2022-04-23 05:55:35',
+  imageURL:
+    'https://firebasestorage.googleapis.com/v0/b/shares-ae9e0.appspot.com/o/knockups%2Fposts%2Ftugyqmhcfp.jgp?alt=media&token=194f66ea-3ecd-445d-ad7c-7df8f7cf80de',
+  joinedAt: '2022-04-23 05:31:33',
+  password: '140111',
+  points: '0',
+  postId: 'tugyqmhcfp',
+  profilePicUrl:
+    'https://firebasestorage.googleapis.com/v0/b/shares-ae9e0.appspot.com/o/knockups%2FprofilePic.jpg?alt=media&token=d5a0acd4-916e-48ac-bb4e-42ed8b0eec8b',
+  text: "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s,",
+  username: 'knockups',
+};
 
 function isDescendant(parent, child) {
   var node = child.parentNode;
@@ -51,8 +70,67 @@ document.addEventListener('click', (e) => {
   }
 });
 
-window.onload = () => {
+let posts = [];
+const getPosts = async () => {
+  try {
+    const response = await fetch('http://localhost:8000/posts.php');
+    const data = await response.json();
+    return data;
+  } catch (err) {
+    showAlert(err.message, false);
+  }
+};
+{
+  /* <i class="fa-solid fa-user"></i> */
+}
+
+const createPostElem = (post) => {
+  const postDiv = document.createElement('div');
+  postDiv.className = 'post';
+  postDiv.innerHTML = `
+  <div class="post-info">
+  <div class="post-header">
+    <div class="post-profile-pic-container">
+    ${
+      post.profilePicUrl
+        ? `<img
+    src="${post.profilePicUrl}"
+  />`
+        : '<i class="fa-solid fa-user"></i>'
+    }
+
+    </div>
+    <div class="post-header-text">
+      <p class="post-user">${post.username}</p>
+      <span class="post-date">${post.joinedAt}</span>
+    </div>
+  </div>
+  <p class="post-text">${post.text}</p>
+</div>
+${
+  post.imageURL &&
+  `
+<img
+  src="${post.imageURL}"
+/>
+`
+}
+
+  `;
+
+  return postDiv;
+};
+const renderPosts = (posts) => {
+  const postsDiv = document.querySelector('.posts');
+  posts.forEach((post) => postsDiv.append(createPostElem(post)));
+};
+
+window.onload = async () => {
   if (window.location.href.includes('index.html')) {
+    const data = await getPosts();
+    posts = data;
+    console.log(posts);
+    renderPosts(posts);
     home.classList.add('focused');
     document.querySelector('#logout').addEventListener('click', () => {
       localStorage.clear();
@@ -83,7 +161,28 @@ window.onload = () => {
     }
   }
 };
+let postBlob = null;
+imgPostUpload &&
+  imgPostUpload.addEventListener('change', () => {
+    if (imgPostUpload.files && imgPostUpload.files[0]) {
+      postBlob = imgPostUpload.files[0];
+      const src = URL.createObjectURL(postBlob);
+      const imgContainer = document.querySelector('.post-img-container');
+      const img = imgContainer.firstElementChild;
+      img.src = src;
+      imgContainer.classList.add('show-post-image');
+    }
+  });
 
+const randId = (l = 10) => {
+  const alpha = 'abcdefghijklmnopqrstuvwxyz';
+  let id = '';
+  for (let i = 0; i < l; i++) {
+    const r = Math.floor(Math.random() * alpha.length);
+    id += alpha[r];
+  }
+  return id;
+};
 let profilePicBlob = null;
 imgUpload &&
   imgUpload.addEventListener('change', function () {
@@ -172,9 +271,7 @@ const signupUser = async (e) => {
     if (profilePicBlob) {
       const profilePicRef = ref(storage, `${data.username}/profilePic.jpg`);
       const snapshot = await uploadBytes(profilePicRef, profilePicBlob);
-      const url = await getDownloadURL(
-        ref(storage, `${data.username}/profilePic.jpg`)
-      );
+      const url = await getDownloadURL(profilePicRef);
       data.profilePicURL = url;
     }
 
@@ -231,5 +328,42 @@ const signinUser = async (e) => {
   }
 };
 
+const sharePost = async (e) => {
+  try {
+    const data = {
+      postId: randId(),
+      text: postText.value.trim(),
+      username: user?.username,
+      imageURL: null,
+    };
+    if (postBlob) {
+      const postImageRef = ref(
+        storage,
+        `${data.username}/posts/${data.postId}.jgp`
+      );
+      const snapshot = await uploadBytes(postImageRef, postBlob);
+      const url = await getDownloadURL(postImageRef);
+      data.imageURL = url;
+    }
+    const response = await fetch('http://localhost:8000/share.php', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data),
+    });
+    const resp = await response.text();
+    console.log(data);
+    // console.log(resp);
+    showAlert('Shared', true);
+    setTimeout(() => {
+      location.reload();
+    }, 1000);
+  } catch (err) {
+    showAlert(err.message, false);
+  }
+};
+
 signup && signup.addEventListener('click', signupUser);
 signin && signin.addEventListener('click', signinUser);
+share && share.addEventListener('click', sharePost);
