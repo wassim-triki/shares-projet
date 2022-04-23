@@ -99,17 +99,14 @@ const createPostElem = (post) => {
   />`
         : '<i class="fa-solid fa-user"></i>'
     }
-
     </div>
     <div class="post-header-text">
       <p class="post-user">${post.username}</p>
       <span class="post-date">${post.joinedAt}</span>
     </div>
-    ${
-      post.username == user.username
-        ? '<div class="post-options"><i class="fa-solid fa-ellipsis"></i></div>'
-        : ''
-    }
+        <div class="post-options ${
+          post.username === user.username ? 'show' : ''
+        }"><i class="fa-solid fa-ellipsis"></i></div>
   </div>
   <p class="post-text">${post.text}</p>
 </div>
@@ -118,30 +115,16 @@ ${
   `
 <img
   src="${post.imageURL}"
-/>
-${
-  post.username == user.username
-    ? `<div class="post-dropdown">
+/>`
+}
+<div class="post-dropdown">
     <div class="post-dropdown-item">
-    <i class="fa-solid fa-pen-to-square"></i> Edit
+    <i class="fa-solid fa-pen-to-square" id="edit"></i> Edit
     </div>
-    <div class="post-dropdown-item" id="logout">
+    <div class="post-dropdown-item" id="trash">
     <i class="fa-solid fa-trash"></i> Delete
     </div>
-  </div>`
-    : ''
-}
-
-`
-}
-  `;
-  const postDropdown = document.querySelector('.post-dropdown');
-  // const postOptions = document.querySelectorAll('.post-options');
-  // console.log(postOptions);
-  // postOptions.addEventListener('click', (e) => {
-  //   console.log(e);
-  //   postDropdown.classList.toggle('show');
-  // });
+  </div>`;
 
   return postDiv;
 };
@@ -158,6 +141,7 @@ window.onload = async () => {
     renderPosts(posts);
     const postDropdown = document.querySelectorAll('.post-dropdown');
     const postOptions = document.querySelectorAll('.post-options');
+    console.log(postOptions, postDropdown);
     for (let i = 0; i < postOptions.length; i++) {
       postOptions[i].addEventListener('click', (e) => {
         postDropdown[i].classList.toggle('show');

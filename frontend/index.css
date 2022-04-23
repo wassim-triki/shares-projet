@@ -382,6 +382,10 @@ textarea::-webkit-scrollbar-thumb {
   align-items: center;
   justify-content: center;
   cursor: pointer;
+  display: none;
+}
+.post-options.show {
+  display: block;
 }
 .post-options:hover {
   background-color: var(--clr-gray);
@@ -389,7 +393,10 @@ textarea::-webkit-scrollbar-thumb {
 .post-options svg {
   width: 100%;
   height: 100%;
-  color: var(--clr-dark);
+  /* color: var(--clr-gray-dark); */
+}
+.post-options path {
+  /* fill: var(--clr-gray-dark); */
 }
 .post-dropdown {
   position: absolute;
@@ -409,4 +416,9 @@ textarea::-webkit-scrollbar-thumb {
 .post-dropdown-item {
   cursor: pointer;
   display: flex;
+}
+.post-dropdown {
+  color: var(--clr-dark);
+  font-weight: 500;
+  z-index: 500;
 }
