@@ -119,10 +119,10 @@ ${
 }
 <div class="post-dropdown">
     <div class="post-dropdown-item">
-    <i class="fa-solid fa-pen-to-square" id="edit"></i> Edit
+    <i class="fa-solid fa-pen-to-square edit" ></i> Edit
     </div>
-    <div class="post-dropdown-item" id="trash">
-    <i class="fa-solid fa-trash"></i> Delete
+    <div class="post-dropdown-item trash" id="${post.postId}" >
+    <i class="fa-solid fa-trash" ></i> Delete
     </div>
   </div>`;
 
@@ -133,15 +133,40 @@ const renderPosts = (posts) => {
   posts.forEach((post) => postsDiv.append(createPostElem(post)));
 };
 
+const deletePost = async (id) => {
+  try {
+    const response = await fetch('http://localhost:8000/posts.php', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: id,
+    });
+    const resp = await response.text();
+    // console.log(resp);
+    showAlert('Deleted', true);
+    setTimeout(() => {
+      location.reload();
+    }, 1000);
+  } catch (err) {
+    showAlert(err.message, false);
+  }
+};
+
 window.onload = async () => {
   if (window.location.href.includes('index.html')) {
     const data = await getPosts();
     posts = data;
     console.log(posts);
     renderPosts(posts);
+    const trash = document.querySelectorAll('.trash');
     const postDropdown = document.querySelectorAll('.post-dropdown');
     const postOptions = document.querySelectorAll('.post-options');
-    console.log(postOptions, postDropdown);
+    for (let i = 0; i < trash.length; i++) {
+      trash[i].addEventListener('click', (e) => {
+        deletePost(e.target.id);
+      });
+    }
     for (let i = 0; i < postOptions.length; i++) {
       postOptions[i].addEventListener('click', (e) => {
         postDropdown[i].classList.toggle('show');
