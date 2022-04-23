@@ -10,14 +10,14 @@ const home = document.querySelector('.home');
 const imgUpload = document.querySelector('#img-upload');
 const imgPostUpload = document.querySelector('#img-post-upload');
 const avatarContainer = document.querySelector('.avatar-container');
-const points = document.querySelector('.points');
+const fame = document.querySelector('.fame');
 const usernameP = document.querySelector('.username');
 const dropdown = document.querySelector('.dropdown');
 const userDiv = document.querySelector('.user');
 const share = document.querySelector('.share-btn');
 const postText = document.querySelector('.post-text');
 
-const sharePoints = 5;
+const shareFame = 5;
 let user = null;
 let loggedinUser = null;
 
@@ -49,7 +49,7 @@ window.addEventListener('DOMContentLoaded', async (event) => {
     const userData = await response.json();
     localStorage.setItem('user', JSON.stringify(userData));
     loggedinUser = userData;
-    points.innerHTML = `${loggedinUser.points} points`;
+    fame.innerHTML = `${loggedinUser.fame} fame`;
     usernameP.innerHTML = loggedinUser.username;
   }
 
@@ -448,14 +448,14 @@ const signinUser = async (e) => {
 };
 const sharePost = async (e) => {
   try {
-    loggedinUser.points = parseInt(loggedinUser.points) + sharePoints;
+    loggedinUser.fame = parseInt(loggedinUser.fame) + shareFame;
 
     const data = {
       postId: randId(),
       text: postText.value.trim(),
       username: loggedinUser?.username,
       imageURL: null,
-      points: loggedinUser.points,
+      fame: loggedinUser.fame,
     };
     if (postBlob) {
       const postImageRef = ref(
