@@ -98,8 +98,9 @@ nav {
 }
 .avatar-container img {
   object-fit: cover;
+  object-position: center;
   width: 100%;
-  height: auto;
+  height: 100%;
 }
 .fa-user {
   width: 100%;

@@ -10,6 +10,7 @@ const imgUpload = document.querySelector('#img-upload');
 const home = document.querySelector('.home');
 const avatarContainer = document.querySelector('.avatar-container');
 let user = null;
+
 window.onload = () => {
   if (window.location.href.includes('index.html')) {
     home.classList.add('focused');
@@ -20,6 +21,21 @@ window.onload = () => {
       avatarContainer.innerHTML = `<img src="${user.profilePicURL}"/>`;
     } else {
       avatarContainer.innerHTML = `<i class="fa-solid fa-user"></i>`;
+    }
+  }
+
+  if (location.href.includes('index.html')) {
+    if (!user) {
+      location.href = './login.html';
+    }
+  }
+  if (
+    location.href.includes('login.html') ||
+    location.href.includes('signup.html')
+  ) {
+    if (user) {
+      console.log('sdsf');
+      location.href = './index.html';
     }
   }
 };
@@ -123,7 +139,7 @@ const signupUser = async (e) => {
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify(user),
+      body: JSON.stringify(data),
     });
 
     responseStatus = response.status;
@@ -131,6 +147,7 @@ const signupUser = async (e) => {
     const resp = await response.text();
     if (responseStatus == 500 || responseStatus == 300)
       throw new Error(JSON.parse(resp).message);
+    console.log(data);
     setTimeout(() => {
       location.href = './login.html';
     }, 2000);
@@ -159,7 +176,6 @@ const signinUser = async (e) => {
       throw new Error(JSON.parse(resp).message);
     user = JSON.parse(resp);
     localStorage.setItem('user', JSON.stringify(user));
-    console.log(user);
     setTimeout(() => {
       location.href = './index.html';
     }, 2000);
