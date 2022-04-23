@@ -9,11 +9,52 @@ const rememberMe = document.querySelector('#remember-me');
 const imgUpload = document.querySelector('#img-upload');
 const home = document.querySelector('.home');
 const avatarContainer = document.querySelector('.avatar-container');
+const points = document.querySelector('.points');
+const dropdown = document.querySelector('.dropdown');
+const userDiv = document.querySelector('.user');
 let user = null;
+
+function isDescendant(parent, child) {
+  var node = child.parentNode;
+  while (node != null) {
+    if (node == parent) {
+      return true;
+    }
+    node = node.parentNode;
+  }
+  return false;
+}
+
+window.addEventListener('DOMContentLoaded', (event) => {
+  if (user) {
+    points.innerHTML = `${user.points} points`;
+  }
+  if (userDiv) {
+    userDiv.addEventListener('click', (e) => {
+      dropdown.classList.toggle('show');
+      const arrow = document.querySelector('#arrow');
+      if (arrow.classList.contains('fa-angle-down'))
+        arrow.classList.replace('fa-angle-down', 'fa-angle-up');
+      else arrow.classList.replace('fa-angle-up', 'fa-angle-down');
+    });
+  }
+});
+document.addEventListener('click', (e) => {
+  if (dropdown && !isDescendant(userDiv, e.target) && e.target !== userDiv) {
+    dropdown.classList.remove('show');
+    document
+      .querySelector('#arrow')
+      .classList.replace('fa-angle-up', 'fa-angle-down');
+  }
+});
 
 window.onload = () => {
   if (window.location.href.includes('index.html')) {
     home.classList.add('focused');
+    document.querySelector('#logout').addEventListener('click', () => {
+      localStorage.clear();
+      location.href = './login.html';
+    });
   }
   user = JSON.parse(localStorage.getItem('user')) || null;
   if (avatarContainer) {
@@ -22,7 +63,6 @@ window.onload = () => {
     } else {
       avatarContainer.innerHTML = `<i class="fa-solid fa-user"></i>`;
     }
-    document.querySelector('.points').innerHTML = `${user.points} points`;
   }
 
   if (location.href.includes('index.html')) {
