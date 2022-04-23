@@ -19,6 +19,7 @@ const postText = document.querySelector('.post-text');
 
 const sharePoints = 5;
 let user = null;
+let loggedinUser = null;
 
 function isDescendant(parent, child) {
   var node = child.parentNode;
@@ -31,15 +32,13 @@ function isDescendant(parent, child) {
   return false;
 }
 
-window.addEventListener('DOMContentLoaded', (e) => {
-  user = JSON.parse(localStorage.getItem('user')) || null;
-  console.log(user);
-});
+// window.addEventListener('DOMContentLoaded', (e) => {
+//   user = JSON.parse(localStorage.getItem('user')) || null;
+//   console.log(user);
+// });
 window.addEventListener('DOMContentLoaded', async (event) => {
-  if (user) {
-    points.innerHTML = `${user.points} points`;
-    usernameP.innerHTML = user.username;
-
+  if (location.href.includes('/index.html')) {
+    user = JSON.parse(localStorage.getItem('user'));
     const response = await fetch('http://localhost:8000/user.php', {
       method: 'POST',
       headers: {
@@ -49,8 +48,11 @@ window.addEventListener('DOMContentLoaded', async (event) => {
     });
     const userData = await response.json();
     localStorage.setItem('user', JSON.stringify(userData));
-    user = userData;
+    loggedinUser = userData;
+    points.innerHTML = `${loggedinUser.points} points`;
+    usernameP.innerHTML = loggedinUser.username;
   }
+
   if (userDiv) {
     userDiv.addEventListener('click', (e) => {
       dropdown.classList.toggle('show');
@@ -105,7 +107,7 @@ const createPostElem = (post) => {
       <span class="post-date">${post.joinedAt}</span>
     </div>
         <div class="post-options ${
-          post.username === user.username ? 'show' : ''
+          post.username === loggedinUser.username ? 'show' : ''
         }"><i class="fa-solid fa-ellipsis"></i></div>
   </div>
   <p class="post-text">${post.text}</p>
@@ -223,7 +225,6 @@ window.onload = async () => {
   if (window.location.href.includes('index.html')) {
     const data = await getPosts();
     posts = data;
-    console.log(posts);
     renderPosts(posts);
     const trash = document.querySelectorAll('.trash');
     const edit = document.querySelectorAll('.edit');
@@ -258,15 +259,15 @@ window.onload = async () => {
     });
   }
   if (avatarContainer) {
-    if (user?.profilePicUrl) {
-      avatarContainer.innerHTML = `<img src="${user.profilePicUrl}"/>`;
+    if (loggedinUser?.profilePicUrl) {
+      avatarContainer.innerHTML = `<img src="${loggedinUser.profilePicUrl}"/>`;
     } else {
       avatarContainer.innerHTML = `<i class="fa-solid fa-user"></i>`;
     }
   }
 
   if (location.href.includes('index.html')) {
-    if (!user) {
+    if (!loggedinUser) {
       location.href = './login.html';
     }
   }
@@ -274,7 +275,7 @@ window.onload = async () => {
     location.href.includes('login.html') ||
     location.href.includes('signup.html')
   ) {
-    if (user) {
+    if (loggedinUser) {
       location.href = './index.html';
     }
   }
@@ -435,8 +436,7 @@ const signinUser = async (e) => {
     if (responseStatus == 500 || responseStatus == 300)
       throw new Error(JSON.parse(resp).message);
     user = JSON.parse(resp);
-    console.log(user);
-    localStorage.setItem('user', JSON.stringify(user));
+    localStorage.setItem('user', JSON.stringify({ username: user.username }));
     setTimeout(() => {
       location.href = './index.html';
     }, 2000);
@@ -448,14 +448,14 @@ const signinUser = async (e) => {
 };
 const sharePost = async (e) => {
   try {
-    user.points = parseInt(user.points) + sharePoints;
+    loggedinUser.points = parseInt(loggedinUser.points) + sharePoints;
 
     const data = {
       postId: randId(),
       text: postText.value.trim(),
-      username: user?.username,
+      username: loggedinUser?.username,
       imageURL: null,
-      points: user.points,
+      points: loggedinUser.points,
     };
     if (postBlob) {
       const postImageRef = ref(
