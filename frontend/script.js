@@ -119,10 +119,29 @@ ${
 <img
   src="${post.imageURL}"
 />
-`
+${
+  post.username == user.username
+    ? `<div class="post-dropdown">
+    <div class="post-dropdown-item">
+    <i class="fa-solid fa-pen-to-square"></i> Edit
+    </div>
+    <div class="post-dropdown-item" id="logout">
+    <i class="fa-solid fa-trash"></i> Delete
+    </div>
+  </div>`
+    : ''
 }
 
+`
+}
   `;
+  const postDropdown = document.querySelector('.post-dropdown');
+  // const postOptions = document.querySelectorAll('.post-options');
+  // console.log(postOptions);
+  // postOptions.addEventListener('click', (e) => {
+  //   console.log(e);
+  //   postDropdown.classList.toggle('show');
+  // });
 
   return postDiv;
 };
@@ -137,6 +156,22 @@ window.onload = async () => {
     posts = data;
     console.log(posts);
     renderPosts(posts);
+    const postDropdown = document.querySelectorAll('.post-dropdown');
+    const postOptions = document.querySelectorAll('.post-options');
+    for (let i = 0; i < postOptions.length; i++) {
+      postOptions[i].addEventListener('click', (e) => {
+        postDropdown[i].classList.toggle('show');
+      });
+      document.addEventListener('click', (e) => {
+        if (
+          postDropdown[i] &&
+          !isDescendant(postOptions[i], e.target) &&
+          e.target !== postOptions[i]
+        ) {
+          postDropdown[i].classList.remove('show');
+        }
+      });
+    }
     home.classList.add('focused');
     document.querySelector('#logout').addEventListener('click', () => {
       localStorage.clear();
@@ -161,11 +196,11 @@ window.onload = async () => {
     location.href.includes('signup.html')
   ) {
     if (user) {
-      console.log('sdsf');
       location.href = './index.html';
     }
   }
 };
+
 let postBlob = null;
 imgPostUpload &&
   imgPostUpload.addEventListener('change', () => {
