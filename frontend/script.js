@@ -37,10 +37,16 @@ function isDescendant(parent, child) {
 //   console.log(user);
 // });
 let likes = null;
+let dislikes = null;
 const fetchLikes = async () => {
   const response = await fetch('http://localhost:8000/likes.php');
   const likes = await response.json();
   return likes;
+};
+const fetchDislikes = async () => {
+  const response = await fetch('http://localhost:8000/dislikes.php');
+  const dislikes = await response.json();
+  return dislikes;
 };
 
 window.addEventListener('DOMContentLoaded', async (event) => {
@@ -59,37 +65,44 @@ window.addEventListener('DOMContentLoaded', async (event) => {
     fame.innerHTML = `${loggedinUser.fame} fame`;
     usernameP.innerHTML = loggedinUser.username;
     likes = await fetchLikes();
-    console.log(likes);
-    console.log(posts);
+    dislikes = await fetchDislikes();
     posts.forEach((p) => {
-      const likeBtn = document.querySelector(`#${p.postId}`);
+      const likeBtn = document.querySelector(`#${p.postId}like`);
+      const dislikeBtn = document.querySelector(`#${p.postId}dislike`);
       likeBtn.innerHTML = `<i class="fa-regular fa-thumbs-up"></i>`;
+      dislikeBtn.innerHTML = '<i class="fa-regular fa-thumbs-down"></i>';
     });
     likes.forEach((l) => {
       const likesSpan = document.querySelector(
-        `#${l.postId}`
+        `#${l.postId}like`
       ).nextElementSibling;
       likesSpan.innerHTML = l.likes;
-
-      // console.log(likeBtn);
-      // console.log(likesSpan);
-      // const liked = await isLiked(l.postId);
-      // if (liked) {
-      //   const likeIcon = document.querySelector(
-      //     `#${l.postId}`
-      //   ).firstElementChild;
-      //   likeIcon.classList.replace('fa-regular', 'fa-Solid');
-      // }
+      console.log(likesSpan);
+    });
+    console.log(dislikes);
+    dislikes.forEach((d) => {
+      const dislikesSpan = document.querySelector(
+        `#${d.postId}dislike`
+      ).nextElementSibling;
+      dislikesSpan.innerHTML = d.dislikes;
     });
 
-    const promises = [];
-    likes.forEach((l) => promises.push(isLiked(l.postId)));
-    const results = await Promise.all(promises);
-    const likedPosts = likes.filter((l, i) => results[i]);
-
+    const promisesLiked = [];
+    likes.forEach((l) => promisesLiked.push(isLiked(l.postId)));
+    const resultsLiked = await Promise.all(promisesLiked);
+    const likedPosts = likes.filter((l, i) => resultsLiked[i]);
     likedPosts.forEach((l) => {
-      const likeBtn = document.querySelector(`#${l.postId}`);
+      const likeBtn = document.querySelector(`#${l.postId}like`);
       likeBtn.innerHTML = `<i class="fa-solid fa-thumbs-up"></i>`;
+    });
+
+    const promisesDisliked = [];
+    dislikes.forEach((d) => promisesDisliked.push(isDisliked(d.postId)));
+    const resultsDisliked = await Promise.all(promisesDisliked);
+    const dislikedPosts = dislikes.filter((l, i) => resultsDisliked[i]);
+    dislikedPosts.forEach((d) => {
+      const dislikeBtn = document.querySelector(`#${d.postId}dislike`);
+      dislikeBtn.innerHTML = `<i class="fa-solid fa-thumbs-down"></i>`;
     });
   }
 
@@ -162,14 +175,16 @@ ${
 }
 <div class="social">
   <div class="social-icon">
-  <button type="button" class="social-btn like"  id="${post.postId}">
+    <button type="button" class="social-btn like"  id="${post.postId}like">
     </button>
-  <span class="likes" id="${post.postId}">0</span>
+    <span class="likes" id="${post.postId}">0</span>
   </div>
+
   <div class="social-icon">
-  <button type="button" class="social-btn  dislike" id="${post.postId}">
-    <i class="fa-regular fa-thumbs-down"></i>
-  </button>
+    <button type="button" class="social-btn  dislike" id="${
+      post.postId
+    }dislike">
+    </button>
     <span class="dislikes" id="${post.postId}">0</span>
   </div>
 </div>
@@ -280,7 +295,7 @@ const isLiked = async (postId) => {
     username,
   };
   try {
-    const response = await fetch('http://localhost:8000/likes.php', {
+    const response = await fetch('http://localhost:8000/checkLiked.php', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -294,13 +309,132 @@ const isLiked = async (postId) => {
     showAlert(err.message, false);
   }
 };
+const isDisliked = async (postId) => {
+  const username = loggedinUser.username;
+  const data = {
+    postId,
+    username,
+  };
+  try {
+    const response = await fetch('http://localhost:8000/checkDisliked.php', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data),
+    });
+    const resp = await response.text();
+    const disliked = parseInt(resp) > 0;
+    return disliked;
+  } catch (err) {
+    showAlert(err.message, false);
+  }
+};
 const likePost = async (id) => {
   try {
     const liked = await isLiked(id);
+    const disliked = await isDisliked(id);
     if (liked) {
-      //remove like
-    } else {
+      // remove dislike
+      const response = await fetch('http://localhost:8000/unlike.php', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ postId: id, username: loggedinUser.username }),
+      });
+      const resp = await response.text();
+      const likesSpan = document.querySelector(`#${id}like`).nextElementSibling;
+      likesSpan.innerHTML = parseInt(likesSpan.innerHTML) - 1;
+      const likeBtn = document.querySelector(`#${id}like`);
+      likeBtn.innerHTML = '<i class="fa-regular fa-thumbs-up"></i>';
+    }
+    if (await isDisliked(id)) {
+      const response = await fetch('http://localhost:8000/undislike.php', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ postId: id, username: loggedinUser.username }),
+      });
+      const resp = await response.text();
+      const dislikesSpan = document.querySelector(
+        `#${id}dislike`
+      ).nextElementSibling;
+      dislikesSpan.innerHTML = parseInt(dislikesSpan.innerHTML) - 1;
+      const dislikeBtn = document.querySelector(`#${id}dislike`);
+      dislikeBtn.innerHTML = '<i class="fa-regular fa-thumbs-down"></i>';
+    }
+    if (!liked || disliked) {
       //add like
+      const response = await fetch('http://localhost:8000/like.php', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ postId: id, username: loggedinUser.username }),
+      });
+      const resp = await response.text();
+      const likesSpan = document.querySelector(`#${id}like`).nextElementSibling;
+      likesSpan.innerHTML = parseInt(likesSpan.innerHTML) + 1;
+      const likeBtn = document.querySelector(`#${id}like`);
+      likeBtn.innerHTML = '<i class="fa-solid fa-thumbs-up"></i>';
+    }
+  } catch (err) {
+    showAlert(err.message, false);
+  }
+};
+const dislikePost = async (id) => {
+  try {
+    const disliked = await isDisliked(id);
+    const liked = await isLiked(id);
+    if (disliked) {
+      //remove like
+      const response = await fetch('http://localhost:8000/undislike.php', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ postId: id, username: loggedinUser.username }),
+      });
+      const resp = await response.text();
+      const dislikesSpan = document.querySelector(
+        `#${id}dislike`
+      ).nextElementSibling;
+      dislikesSpan.innerHTML = parseInt(dislikesSpan.innerHTML) - 1;
+      const dislikeBtn = document.querySelector(`#${id}dislike`);
+      dislikeBtn.innerHTML = '<i class="fa-regular fa-thumbs-down"></i>';
+    }
+    if (await isLiked(id)) {
+      const response = await fetch('http://localhost:8000/unlike.php', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ postId: id, username: loggedinUser.username }),
+      });
+      const resp = await response.text();
+      const likesSpan = document.querySelector(`#${id}like`).nextElementSibling;
+      likesSpan.innerHTML = parseInt(likesSpan.innerHTML) - 1;
+      const likeBtn = document.querySelector(`#${id}like`);
+      likeBtn.innerHTML = '<i class="fa-regular fa-thumbs-up"></i>';
+    }
+    if (!disliked || liked) {
+      //add dislike
+      const response = await fetch('http://localhost:8000/dislike.php', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ postId: id, username: loggedinUser.username }),
+      });
+      const resp = await response.text();
+      const dislikesSpan = document.querySelector(
+        `#${id}dislike`
+      ).nextElementSibling;
+      dislikesSpan.innerHTML = parseInt(dislikesSpan.innerHTML) + 1;
+      const likeBtn = document.querySelector(`#${id}dislike`);
+      likeBtn.innerHTML = '<i class="fa-solid fa-thumbs-down"></i>';
     }
   } catch (err) {
     showAlert(err.message, false);
@@ -313,9 +447,15 @@ window.onload = async () => {
     console.log(posts);
     renderPosts(posts);
     const likes = document.querySelectorAll('.like');
+    const dislikes = document.querySelectorAll('.dislike');
     for (let i = 0; i < likes.length; i++) {
       likes[i].addEventListener('click', (e) => {
-        likePost(likes[i].id);
+        likePost(likes[i].id.replace('like', ''));
+      });
+    }
+    for (let i = 0; i < dislikes.length; i++) {
+      dislikes[i].addEventListener('click', (e) => {
+        dislikePost(dislikes[i].id.replace('dislike', ''));
       });
     }
     const trash = document.querySelectorAll('.trash');

@@ -4,16 +4,7 @@ include_once "./db.php";
 header("Access-Control-Allow-Origin: *");
 header("Access-Control-Allow-Headers: Origin, X-Requested-With, Content-Type, Accept");
 
-function likePost($connection){
-  $data=json_decode(file_get_contents('php://input'));
-  // var_dump( $data);
-  $count=null;
-  $result=mysqli_query($connection,"SELECT COUNT(*) FROM likes WHERE postId='$data->postId' AND username='$data->username'");
-  while($row=mysqli_fetch_row($result)){
-    $count=$row;
-  }
-  echo($count[0]);
-}
+
 function getLikes($connection){
   $result=mysqli_query($connection,"SELECT postId,COUNT(*) as likes FROM likes GROUP BY postId");
   $data=array();
@@ -24,8 +15,13 @@ function getLikes($connection){
   }
   echo(json_encode($data));
 }
+function removeLike($connection){
+  $data=json_decode(file_get_contents('php://input'));
+  var_dump( $data);
+
+}
 if($_SERVER["REQUEST_METHOD"]=="POST"){
-  likePost($connection);
+  removeLike($connection);
 }
 if($_SERVER["REQUEST_METHOD"]=="GET"){
   getLikes($connection);
