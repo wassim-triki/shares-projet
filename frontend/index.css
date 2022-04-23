@@ -364,3 +364,23 @@ textarea::-webkit-scrollbar-thumb {
   width: 100%;
   height: 100%;
 }
+
+.post-options {
+  margin-left: auto;
+  width: 35px;
+  height: 35px;
+  padding: 0.3rem;
+  border-radius: 500px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+.post-options:hover {
+  background-color: var(--clr-gray);
+}
+.post-options svg {
+  width: 100%;
+  height: 100%;
+  color: var(--clr-dark);
+}

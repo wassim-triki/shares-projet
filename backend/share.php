@@ -8,21 +8,8 @@ function share($connection){
   $data=json_decode(file_get_contents('php://input'));
   var_dump($data);
   $result =mysqli_query($connection,"INSERT INTO posts (postId,username, text,imageURL) VALUES ('$data->postId','$data->username','$data->text','$data->imageURL')");
-  // if($result->num_rows<1){
-  //   $result=mysqli_query($connection,"INSERT INTO users (username, password, profilePicURL) VALUES ('$data->username','$data->password','$data->profilePicURL')");
-  //   if($result){
-  //     // echo "Sign up Seccessful";
-  //   }else{
-  //     header('HTTP/1.1 500 Internal Server Error');
-  //     header('Content-Type: application/json; charset=UTF-8');
-  //     die(json_encode(array('message' => 'Internal Server Error', 'code' => 1337)));
-  //   }
+  $result=mysqli_query($connection,"UPDATE users SET points='$data->points' WHERE username='$data->username'");
 
-  // }else{
-  //   header('HTTP/1.1 300 Internal Server Error');
-  //     header('Content-Type: application/json; charset=UTF-8');
-  //     die(json_encode(array('message' => 'Username taken', 'code' => 1337)));
-  // }
 }
 if($_SERVER["REQUEST_METHOD"]=="POST"){
   share($connection);

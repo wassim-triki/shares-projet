@@ -17,22 +17,8 @@ const userDiv = document.querySelector('.user');
 const share = document.querySelector('.share-btn');
 const postText = document.querySelector('.post-text');
 
-const postPoints = 5;
+const sharePoints = 5;
 let user = null;
-
-const p = {
-  createdAt: '2022-04-23 05:55:35',
-  imageURL:
-    'https://firebasestorage.googleapis.com/v0/b/shares-ae9e0.appspot.com/o/knockups%2Fposts%2Ftugyqmhcfp.jgp?alt=media&token=194f66ea-3ecd-445d-ad7c-7df8f7cf80de',
-  joinedAt: '2022-04-23 05:31:33',
-  password: '140111',
-  points: '0',
-  postId: 'tugyqmhcfp',
-  profilePicUrl:
-    'https://firebasestorage.googleapis.com/v0/b/shares-ae9e0.appspot.com/o/knockups%2FprofilePic.jpg?alt=media&token=d5a0acd4-916e-48ac-bb4e-42ed8b0eec8b',
-  text: "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s,",
-  username: 'knockups',
-};
 
 function isDescendant(parent, child) {
   var node = child.parentNode;
@@ -45,11 +31,25 @@ function isDescendant(parent, child) {
   return false;
 }
 
-window.addEventListener('DOMContentLoaded', (event) => {
+window.addEventListener('DOMContentLoaded', (e) => {
   user = JSON.parse(localStorage.getItem('user')) || null;
+  console.log(user);
+});
+window.addEventListener('DOMContentLoaded', async (event) => {
   if (user) {
     points.innerHTML = `${user.points} points`;
     usernameP.innerHTML = user.username;
+
+    const response = await fetch('http://localhost:8000/user.php', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: user?.username,
+    });
+    const userData = await response.json();
+    localStorage.setItem('user', JSON.stringify(userData));
+    user = userData;
   }
   if (userDiv) {
     userDiv.addEventListener('click', (e) => {
@@ -61,6 +61,7 @@ window.addEventListener('DOMContentLoaded', (event) => {
     });
   }
 });
+
 document.addEventListener('click', (e) => {
   if (dropdown && !isDescendant(userDiv, e.target) && e.target !== userDiv) {
     dropdown.classList.remove('show');
@@ -104,6 +105,11 @@ const createPostElem = (post) => {
       <p class="post-user">${post.username}</p>
       <span class="post-date">${post.joinedAt}</span>
     </div>
+    ${
+      post.username == user.username
+        ? '<div class="post-options"><i class="fa-solid fa-ellipsis"></i></div>'
+        : ''
+    }
   </div>
   <p class="post-text">${post.text}</p>
 </div>
@@ -137,10 +143,9 @@ window.onload = async () => {
       location.href = './login.html';
     });
   }
-  user = JSON.parse(localStorage.getItem('user')) || null;
   if (avatarContainer) {
-    if (user?.profilePicURL) {
-      avatarContainer.innerHTML = `<img src="${user.profilePicURL}"/>`;
+    if (user?.profilePicUrl) {
+      avatarContainer.innerHTML = `<img src="${user.profilePicUrl}"/>`;
     } else {
       avatarContainer.innerHTML = `<i class="fa-solid fa-user"></i>`;
     }
@@ -327,14 +332,16 @@ const signinUser = async (e) => {
     showAlert(err.message, false);
   }
 };
-
 const sharePost = async (e) => {
   try {
+    user.points = parseInt(user.points) + sharePoints;
+
     const data = {
       postId: randId(),
       text: postText.value.trim(),
       username: user?.username,
       imageURL: null,
+      points: user.points,
     };
     if (postBlob) {
       const postImageRef = ref(
@@ -345,6 +352,9 @@ const sharePost = async (e) => {
       const url = await getDownloadURL(postImageRef);
       data.imageURL = url;
     }
+    if (data.text.length === 0 && data.imageURL == null)
+      throw new Error('Please type something');
+
     const response = await fetch('http://localhost:8000/share.php', {
       method: 'POST',
       headers: {
@@ -353,8 +363,6 @@ const sharePost = async (e) => {
       body: JSON.stringify(data),
     });
     const resp = await response.text();
-    console.log(data);
-    // console.log(resp);
     showAlert('Shared', true);
     setTimeout(() => {
       location.reload();
