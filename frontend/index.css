@@ -21,7 +21,7 @@ nav {
   align-items: center;
   padding: 0 2rem;
   gap: 1rem;
-  z-index: 1000;
+  z-index: 100000;
 }
 .nav-logo {
   height: 70%;
@@ -210,7 +210,9 @@ nav {
   gap: 1rem;
   box-shadow: 0px 0px 4px 0px rgb(83 83 83 / 14%);
 }
-.post-container textarea {
+
+.post-container textarea,
+textarea {
   width: 100%;
   flex: 1;
   min-height: 80px;
@@ -228,6 +230,33 @@ nav {
   overflow: hidden;
   height: fit-content;
   display: none;
+  position: relative;
+}
+.btn-times {
+  position: absolute;
+  background: transparent;
+  width: 35px;
+  height: 35px;
+  border-radius: 5000px;
+  background-color: var(--clr-danger);
+  border: none;
+  color: white;
+  font-size: large;
+  top: 50%;
+  left: 50%;
+  display: none;
+  transform: translate(-50%, -50%);
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+}
+
+.btn-times:hover {
+  background-color: var(--clr-danger-light);
+  width: 45px;
+  height: 45px;
+}
+.post-img-container:hover .btn-times {
+  display: block;
 }
 .post-img-container.show-post-image {
   display: block;
@@ -301,7 +330,8 @@ textarea::-webkit-scrollbar-thumb {
   border: 1px solid white;
 }
 
-.post-container .share-btn {
+.post-container .share-btn,
+.save-btn {
   width: 100%;
   border: none;
   border-radius: 5px;
@@ -313,6 +343,12 @@ textarea::-webkit-scrollbar-thumb {
 }
 .share-btn:hover {
   background: var(--clr-accent-light);
+}
+.save-btn {
+  background-color: var(--clr-variant);
+}
+.save-btn:hover {
+  background: var(--clr-variant-light);
 }
 .post-info {
   padding: 1rem;
@@ -421,4 +457,8 @@ textarea::-webkit-scrollbar-thumb {
   color: var(--clr-dark);
   font-weight: 500;
   z-index: 500;
+}
+
+.hidden {
+  display: none;
 }

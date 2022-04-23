@@ -13,11 +13,15 @@
   --clr-gray: rgb(238, 238, 238);
   --clr-accent: #2176ae;
   --clr-accent-light: #52a1d6;
+  --clr-variant: #18b64c;
+  --clr-variant-light: #22da5f;
   --clr-gray-normal: #cccccc;
   --clr-gray-medium: #a6a6a6;
   --clr-gray-dark: #787878;
   --clr-success: rgb(113, 255, 113);
   --clr-danger: rgb(252, 80, 80);
+  --clr-danger: rgb(252, 80, 80);
+  --clr-danger-light: #fe6e6e;
 }
 
 #alert {

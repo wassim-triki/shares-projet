@@ -109,6 +109,7 @@ const createPostElem = (post) => {
         }"><i class="fa-solid fa-ellipsis"></i></div>
   </div>
   <p class="post-text">${post.text}</p>
+
 </div>
 ${
   post.imageURL &&
@@ -118,8 +119,8 @@ ${
 />`
 }
 <div class="post-dropdown">
-    <div class="post-dropdown-item">
-    <i class="fa-solid fa-pen-to-square edit" ></i> Edit
+    <div class="post-dropdown-item edit" id="${post.postId}">
+    <i class="fa-solid fa-pen-to-square" ></i> Edit
     </div>
     <div class="post-dropdown-item trash" id="${post.postId}" >
     <i class="fa-solid fa-trash" ></i> Delete
@@ -153,6 +154,71 @@ const deletePost = async (id) => {
   }
 };
 
+const savePost = async (post) => {
+  try {
+    const data = {
+      postId: post.postId,
+      text: postText.value.trim(),
+      imageURL: post.imageURL,
+    };
+    if (postBlob) {
+      const postImageRef = ref(
+        storage,
+        `${data.username}/posts/${data.postId}.jgp`
+      );
+      const snapshot = await uploadBytes(postImageRef, postBlob);
+      const url = await getDownloadURL(postImageRef);
+      data.imageURL = url;
+    }
+    const response = await fetch('http://localhost:8000/posts.php', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data),
+    });
+    const resp = await response.text();
+    showAlert('Updated', true);
+    setTimeout(() => {
+      location.reload();
+    }, 1000);
+  } catch (err) {
+    showAlert(err.message, false);
+  }
+};
+
+const editPost = (id) => {
+  const [post] = posts.filter((p) => p.postId == id);
+  window.scrollTo({
+    top: 0,
+    behavior: 'smooth',
+  });
+  document.querySelector('.post-text').textContent = post.text;
+  if (post.imageURL) {
+    document.querySelector('#post-img').src = post?.imageURL;
+    const imgContainer = document.querySelector('.post-img-container');
+    const btn = document.createElement('button');
+    btn.classList.add('btn-times');
+    const times = document.createElement('i');
+    times.classList.add('fa-solid', 'fa-xmark');
+    btn.append(times);
+    imgContainer.append(btn);
+
+    imgContainer.classList.add('show-post-image');
+    btn.addEventListener('click', (e) => {
+      post.imageURL = null;
+      document.querySelector('#post-img').src = '';
+      imgContainer.classList.remove('show-post-image');
+    });
+  }
+  const save = document.querySelector('.save-btn');
+  share.classList.add('hidden');
+  save.classList.remove('hidden');
+  save.addEventListener('click', (e) => {
+    savePost(post);
+  });
+};
+
 window.onload = async () => {
   if (window.location.href.includes('index.html')) {
     const data = await getPosts();
@@ -160,11 +226,15 @@ window.onload = async () => {
     console.log(posts);
     renderPosts(posts);
     const trash = document.querySelectorAll('.trash');
+    const edit = document.querySelectorAll('.edit');
     const postDropdown = document.querySelectorAll('.post-dropdown');
     const postOptions = document.querySelectorAll('.post-options');
     for (let i = 0; i < trash.length; i++) {
       trash[i].addEventListener('click', (e) => {
         deletePost(e.target.id);
+      });
+      edit[i].addEventListener('click', (e) => {
+        editPost(e.target.id);
       });
     }
     for (let i = 0; i < postOptions.length; i++) {
