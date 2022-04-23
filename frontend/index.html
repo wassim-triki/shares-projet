@@ -19,6 +19,7 @@
     />
     <link rel="stylesheet" href="./index.css" />
     <link rel="icon" type="image/x-icon" href="./images/icons/favicon.ico" />
+
     <title>Document</title>
   </head>
   <body>
@@ -37,7 +38,7 @@
           <i class="fa-solid fa-user"></i>
         </div>
         <div class="text">
-          <p class="username">wassimtriki</p>
+          <p class="username">username</p>
           <p class="points">0 points</p>
         </div>
         <i class="fa-solid fa-angle-down" id="arrow"></i>
@@ -51,6 +52,28 @@
         </div>
       </div>
     </nav>
+
+    <main class="index main">
+      <div class="post-container">
+        <textarea
+          name="post"
+          id="post"
+          placeholder="What's on your mind?"
+          class="one"
+        ></textarea>
+        <div class="extra">
+          <input type="file" id="img-upload" accept="image/*" />
+          <label class="icon-container" for="img-upload">
+            <i class="fa-solid fa-image"></i>
+          </label>
+          <div type="button" class="icon-container emoji-picker">
+            <i class="fa-solid fa-face-laugh"></i>
+          </div>
+        </div>
+        <div id="hr"></div>
+        <button class="share-btn">Share</button>
+      </div>
+    </main>
 
     <script src="./script.js" type="module"></script>
   </body>

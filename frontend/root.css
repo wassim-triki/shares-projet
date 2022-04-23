@@ -11,7 +11,9 @@
 :root {
   --clr-dark: #101727;
   --clr-gray: rgb(238, 238, 238);
+  --clr-accent: #2176ae;
   --clr-gray-normal: #cccccc;
+  --clr-gray-medium: #a6a6a6;
   --clr-gray-dark: #787878;
   --clr-success: rgb(113, 255, 113);
   --clr-danger: rgb(252, 80, 80);

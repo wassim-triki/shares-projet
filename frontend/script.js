@@ -10,6 +10,7 @@ const imgUpload = document.querySelector('#img-upload');
 const home = document.querySelector('.home');
 const avatarContainer = document.querySelector('.avatar-container');
 const points = document.querySelector('.points');
+const usernameP = document.querySelector('.username');
 const dropdown = document.querySelector('.dropdown');
 const userDiv = document.querySelector('.user');
 let user = null;
@@ -26,8 +27,10 @@ function isDescendant(parent, child) {
 }
 
 window.addEventListener('DOMContentLoaded', (event) => {
+  user = JSON.parse(localStorage.getItem('user')) || null;
   if (user) {
     points.innerHTML = `${user.points} points`;
+    usernameP.innerHTML = user.username;
   }
   if (userDiv) {
     userDiv.addEventListener('click', (e) => {

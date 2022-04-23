@@ -1,16 +1,18 @@
 @import './root.css';
 
 body {
-  width: 100vw;
+  width: 99vw;
   height: 100vh;
   display: flex;
   justify-content: center;
   align-items: center;
   position: relative;
+  background-color: var(--clr-gray);
 }
 nav {
   position: fixed;
   /* border: 1px solid red; */
+  background-color: #ffffff;
   box-shadow: 0px 0px 4px 0px rgb(83 83 83 / 14%);
   display: flex;
   top: 0;
@@ -35,7 +37,7 @@ nav {
 
 .home.focused,
 .home:hover {
-  background-color: var(--clr-dark);
+  background-color: var(--clr-accent);
   color: white;
 }
 .search-form {
@@ -170,4 +172,113 @@ nav {
 .dropdown-item svg {
   margin: 0;
   font-size: large;
+}
+
+.index.main {
+  /* border: 1px solid red; */
+  border-radius: 8px;
+  width: max(30%, 400px);
+  height: 100%;
+  margin-top: 150px;
+  display: flex;
+  flex-direction: column;
+  padding: 1rem;
+  /* background-color: var(-); */
+}
+
+.post-container {
+  width: 100%;
+  min-height: 100px;
+  /* max-height: 200px; */
+  background-color: white;
+  display: flex;
+  flex-direction: column;
+  border-radius: 8px;
+  padding: 1rem;
+  gap: 1rem;
+}
+.post-container textarea {
+  width: 100%;
+  flex: 1;
+  min-height: 80px;
+  resize: none;
+  font-weight: 500;
+  color: var(--clr-dark);
+  font-size: large;
+  border-radius: 8px;
+  border: none;
+  outline: none;
+}
+.extra {
+  display: flex;
+  gap: 0.5rem;
+}
+.extra .icon-container {
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 5000px;
+  border: 2px solid var(--clr-gray-dark);
+  padding: 0.1rem;
+  cursor: pointer;
+}
+label.icon-container:first-of-type {
+  border: none;
+}
+
+#img-upload {
+  display: none;
+}
+
+.icon-container:first-of-type path {
+  /* fill: var(--clr-success); */
+}
+.icon-container svg {
+  width: 100%;
+  height: 100%;
+  color: var(--clr-gray-dark);
+}
+.post-container #hr {
+  height: 1px;
+  align-self: center;
+  width: 100%;
+  background-color: var(--clr-gray);
+}
+
+.post-container textarea::placeholder {
+  color: var(--clr-gray-medium);
+}
+
+/* ===== Scrollbar CSS ===== */
+/* Firefox */
+textarea {
+  scrollbar-width: thin;
+  scrollbar-color: var(--clr-gray-normal) #ffffff;
+}
+
+/* Chrome, Edge, and Safari */
+textarea::-webkit-scrollbar {
+  width: 8px;
+}
+
+textarea::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+textarea::-webkit-scrollbar-thumb {
+  background-color: var(--clr-gray-normal);
+  border-radius: 10px;
+  border: 1px solid white;
+}
+
+.post-container .share-btn {
+  width: 100%;
+  border: none;
+  border-radius: 5px;
+  font-size: large;
+  padding: 0.4rem;
+  background-color: var(--clr-accent);
+  color: white;
 }
