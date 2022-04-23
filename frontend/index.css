@@ -81,7 +81,8 @@ nav {
   display: flex;
   align-items: center;
   padding: 0.3rem;
-  padding-right: 0.5rem;
+  /* padding-left: 0.5rem; */
+  padding-right: 1rem;
   border-radius: 500px;
   cursor: pointer;
   gap: 0.5rem;
@@ -113,6 +114,18 @@ nav {
   height: 100%;
   color: var(--clr-gray-dark);
 }
+.user .text {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
 .user p {
+  color: var(--clr-gray-dark);
+}
+.user .username {
+  line-height: 0.9rem;
+}
+.user .points {
+  font-size: small;
   color: var(--clr-gray-dark);
 }

@@ -6,7 +6,7 @@ header("Access-Control-Allow-Headers: Origin, X-Requested-With, Content-Type, Ac
 
 function signin($connection){
   $data=json_decode( file_get_contents('php://input'));
-  $result =mysqli_query($connection,"SELECT username,profilePicURL,joinedAt FROM users WHERE username='$data->username' AND password='$data->password'");
+  $result =mysqli_query($connection,"SELECT username,profilePicURL,joinedAt,points FROM users WHERE username='$data->username' AND password='$data->password'");
   // var_dump($result);
   if($result->num_rows===1){
     while($r=mysqli_fetch_assoc($result)){

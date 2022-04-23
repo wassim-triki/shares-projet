@@ -22,6 +22,7 @@ window.onload = () => {
     } else {
       avatarContainer.innerHTML = `<i class="fa-solid fa-user"></i>`;
     }
+    document.querySelector('.points').innerHTML = `${user.points} points`;
   }
 
   if (location.href.includes('index.html')) {
@@ -175,6 +176,7 @@ const signinUser = async (e) => {
     if (responseStatus == 500 || responseStatus == 300)
       throw new Error(JSON.parse(resp).message);
     user = JSON.parse(resp);
+    console.log(user);
     localStorage.setItem('user', JSON.stringify(user));
     setTimeout(() => {
       location.href = './index.html';
