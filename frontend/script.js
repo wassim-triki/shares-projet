@@ -32,10 +32,6 @@ function isDescendant(parent, child) {
   return false;
 }
 
-// window.addEventListener('DOMContentLoaded', (e) => {
-//   user = JSON.parse(localStorage.getItem('user')) || null;
-//   console.log(user);
-// });
 let likes = null;
 let dislikes = null;
 const fetchLikes = async () => {
@@ -50,8 +46,11 @@ const fetchDislikes = async () => {
 };
 
 window.addEventListener('DOMContentLoaded', async (event) => {
+  user = JSON.parse(localStorage.getItem('user'));
+  if (!user && location.href.includes('/index.html'))
+    location.href = './login.html';
+
   if (location.href.includes('/index.html')) {
-    user = JSON.parse(localStorage.getItem('user'));
     const response = await fetch('http://localhost:8000/user.php', {
       method: 'POST',
       headers: {
@@ -60,9 +59,9 @@ window.addEventListener('DOMContentLoaded', async (event) => {
       body: user?.username,
     });
     const userData = await response.json();
-    localStorage.setItem('user', JSON.stringify(userData));
     loggedinUser = userData;
-    fame.innerHTML = `${loggedinUser.fame} fame`;
+    console.log('mysql data: ', loggedinUser);
+    fame.innerHTML = `${parseInt(loggedinUser.likes) * 5} fame`;
     usernameP.innerHTML = loggedinUser.username;
     likes = await fetchLikes();
     dislikes = await fetchDislikes();
@@ -77,9 +76,7 @@ window.addEventListener('DOMContentLoaded', async (event) => {
         `#${l.postId}like`
       ).nextElementSibling;
       likesSpan.innerHTML = l.likes;
-      console.log(likesSpan);
     });
-    console.log(dislikes);
     dislikes.forEach((d) => {
       const dislikesSpan = document.querySelector(
         `#${d.postId}dislike`
@@ -664,16 +661,19 @@ const signinUser = async (e) => {
       body: JSON.stringify(data),
     });
     responseStatus = response.status;
-    console.log(response);
+    const resp = await response.text();
+
     if (responseStatus == 500 || responseStatus == 300)
       throw new Error(JSON.parse(resp).message);
 
-    const resp = await response.text();
-    user = JSON.parse(resp);
-    localStorage.setItem('user', JSON.stringify({ username: user.username }));
+    loggedinUser = JSON.parse(resp);
+    localStorage.setItem(
+      'user',
+      JSON.stringify({ username: loggedinUser.username })
+    );
     setTimeout(() => {
       location.href = './index.html';
-    }, 2000);
+    }, 1000);
 
     showAlert('Sign in successful', true);
   } catch (err) {
@@ -682,14 +682,11 @@ const signinUser = async (e) => {
 };
 const sharePost = async (e) => {
   try {
-    loggedinUser.fame = parseInt(loggedinUser.fame) + shareFame;
-
     const data = {
       postId: randId(),
       text: postText.value.trim(),
       username: loggedinUser?.username,
       imageURL: null,
-      fame: loggedinUser.fame,
     };
     if (postBlob) {
       const postImageRef = ref(
