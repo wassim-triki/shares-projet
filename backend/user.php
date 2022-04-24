@@ -10,6 +10,11 @@ function getUser($connection){
   $result =mysqli_query($connection,"SELECT * FROM users WHERE username='$username'");
   // var_dump($result);
   $result2=mysqli_query($connection,"SELECT COUNT(*) AS likes FROM likes,posts WHERE likes.postId=posts.postId AND posts.username='$username'");
+  $result3=mysqli_query($connection,"SELECT COUNT(*) AS 'posts' FROM posts WHERE posts.username='$username'");
+  $posts=null;
+  while($r3=mysqli_fetch_row($result3)){
+    $posts=$r3[0];
+  }
   $likes=null;
   while($r2=mysqli_fetch_row($result2)){
     $likes=$r2[0];
@@ -20,6 +25,7 @@ function getUser($connection){
   }
   $user=(object)$rows[0];
   $user->likes=$likes;
+  $user->posts=$posts;
   print(json_encode($user));
 }
 if($_SERVER["REQUEST_METHOD"]=="POST"){

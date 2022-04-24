@@ -18,6 +18,7 @@ const share = document.querySelector('.share-btn');
 const postText = document.querySelector('.post-text');
 
 const shareFame = 5;
+const likeFame = 10;
 let user = null;
 let loggedinUser = null;
 
@@ -61,7 +62,10 @@ window.addEventListener('DOMContentLoaded', async (event) => {
     const userData = await response.json();
     loggedinUser = userData;
     console.log('mysql data: ', loggedinUser);
-    fame.innerHTML = `${parseInt(loggedinUser.likes) * 5} fame`;
+    fame.innerHTML = `${
+      parseInt(loggedinUser.posts) * shareFame +
+      parseInt(loggedinUser.likes) * likeFame
+    } fame`;
     usernameP.innerHTML = loggedinUser.username;
     likes = await fetchLikes();
     dislikes = await fetchDislikes();
