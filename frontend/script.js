@@ -8,6 +8,8 @@ const repeatPassword = document.querySelector('#repeat-password');
 const rememberMe = document.querySelector('#remember-me');
 const home = document.querySelector('.home');
 const imgUpload = document.querySelector('#img-upload');
+const searchBtn = document.querySelector('.search-btn');
+const searchInput = document.querySelector('.search-input');
 const imgPostUpload = document.querySelector('#img-post-upload');
 const avatarContainer = document.querySelector('.avatar-container');
 const fame = document.querySelector('.fame');
@@ -22,6 +24,12 @@ const likeFame = 10;
 let user = null;
 let loggedinUser = null;
 
+searchBtn?.addEventListener('click', async (e) => {
+  localStorage.setItem('searchTerm', searchInput.value.trim());
+});
+home?.addEventListener('click', (e) => {
+  localStorage.removeItem('searchTerm');
+});
 function isDescendant(parent, child) {
   var node = child.parentNode;
   while (node != null) {
@@ -69,7 +77,7 @@ window.addEventListener('DOMContentLoaded', async (event) => {
     usernameP.innerHTML = loggedinUser.username;
     likes = await fetchLikes();
     dislikes = await fetchDislikes();
-    posts.forEach((p) => {
+    posts?.forEach((p) => {
       const likeBtn = document.querySelector(`#${p.postId}like`);
       const dislikeBtn = document.querySelector(`#${p.postId}dislike`);
       likeBtn.innerHTML = `<i class="fa-regular fa-thumbs-up"></i>`;
@@ -78,14 +86,14 @@ window.addEventListener('DOMContentLoaded', async (event) => {
     likes.forEach((l) => {
       const likesSpan = document.querySelector(
         `#${l.postId}like`
-      ).nextElementSibling;
-      likesSpan.innerHTML = l.likes;
+      )?.nextElementSibling;
+      if (likesSpan) likesSpan.innerHTML = l.likes;
     });
     dislikes.forEach((d) => {
       const dislikesSpan = document.querySelector(
         `#${d.postId}dislike`
-      ).nextElementSibling;
-      dislikesSpan.innerHTML = d.dislikes;
+      )?.nextElementSibling;
+      if (dislikesSpan) dislikesSpan.innerHTML = d.dislikes;
     });
 
     const promisesLiked = [];
@@ -94,7 +102,7 @@ window.addEventListener('DOMContentLoaded', async (event) => {
     const likedPosts = likes.filter((l, i) => resultsLiked[i]);
     likedPosts.forEach((l) => {
       const likeBtn = document.querySelector(`#${l.postId}like`);
-      likeBtn.innerHTML = `<i class="fa-solid fa-thumbs-up"></i>`;
+      if (likeBtn) likeBtn.innerHTML = `<i class="fa-solid fa-thumbs-up"></i>`;
     });
 
     const promisesDisliked = [];
@@ -103,7 +111,8 @@ window.addEventListener('DOMContentLoaded', async (event) => {
     const dislikedPosts = dislikes.filter((l, i) => resultsDisliked[i]);
     dislikedPosts.forEach((d) => {
       const dislikeBtn = document.querySelector(`#${d.postId}dislike`);
-      dislikeBtn.innerHTML = `<i class="fa-solid fa-thumbs-down"></i>`;
+      if (dislikeBtn)
+        dislikeBtn.innerHTML = `<i class="fa-solid fa-thumbs-down"></i>`;
     });
   }
 
@@ -128,13 +137,21 @@ document.addEventListener('click', (e) => {
 });
 
 let posts = [];
-const getPosts = async () => {
+const getPosts = async (searchTerm = '') => {
   try {
-    const response = await fetch('http://localhost:8000/posts.php');
+    const response = await fetch('http://localhost:8000/getPosts.php', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: searchTerm,
+    });
     const data = await response.json();
+    console.log(data);
     return data;
   } catch (err) {
     showAlert(err.message, false);
+    throw err;
   }
 };
 {
@@ -158,7 +175,7 @@ const createPostElem = (post) => {
     </div>
     <div class="post-header-text">
       <p class="post-user">${post.username}</p>
-      <span class="post-date">${post.joinedAt}</span>
+      <span class="post-date">${post.createdAt}</span>
     </div>
         <div class="post-options ${
           post.username === loggedinUser.username ? 'show' : ''
@@ -202,7 +219,7 @@ ${
 };
 const renderPosts = (posts) => {
   const postsDiv = document.querySelector('.posts');
-  posts.forEach((post) => postsDiv.append(createPostElem(post)));
+  posts?.forEach((post) => postsDiv.append(createPostElem(post)));
 };
 
 const deletePost = async (id) => {
@@ -443,9 +460,9 @@ const dislikePost = async (id) => {
 };
 window.onload = async () => {
   if (window.location.href.includes('index.html')) {
-    const data = await getPosts();
+    const data = await getPosts(localStorage.getItem('searchTerm') || '');
     posts = data;
-    console.log(posts);
+    // console.log(posts);
     renderPosts(posts);
     const likes = document.querySelectorAll('.like');
     const dislikes = document.querySelectorAll('.dislike');

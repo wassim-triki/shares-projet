@@ -132,6 +132,7 @@ nav {
 .user .fame {
   font-size: small;
   color: var(--clr-gray-dark);
+  color: var(--clr-accent);
 }
 .user svg path {
   fill: var(--clr-gray-dark);
