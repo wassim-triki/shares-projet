@@ -6,7 +6,7 @@ $password="140111";
 
 
 
-$connection=new mysqli($host,$username,$password,$db);
+$connection=new mysqli($host,$username,$password,$db,'3306');
 
 if($connection->connect_errno){
   http_response_code(400);

@@ -18,6 +18,7 @@ const dropdown = document.querySelector('.dropdown');
 const userDiv = document.querySelector('.user');
 const share = document.querySelector('.share-btn');
 const postText = document.querySelector('.post-text');
+const profile = document.querySelector('#profile');
 
 const shareFame = 5;
 const likeFame = 10;
@@ -26,6 +27,10 @@ let loggedinUser = null;
 
 searchBtn?.addEventListener('click', async (e) => {
   localStorage.setItem('searchTerm', searchInput.value.trim());
+  if (!location.href.includes('/index.html')) {
+    e.preventDefault();
+    location.href = './index.html';
+  }
 });
 home?.addEventListener('click', (e) => {
   localStorage.removeItem('searchTerm');
@@ -43,23 +48,58 @@ function isDescendant(parent, child) {
 
 let likes = null;
 let dislikes = null;
-const fetchLikes = async () => {
-  const response = await fetch('http://localhost:8000/likes.php');
-  const likes = await response.json();
-  return likes;
+
+const fetchReactions = async (reactName) => {
+  const response = await fetch(`http://localhost:8000/${reactName}.php`);
+  const reacts = await response.json();
+  return reacts;
 };
-const fetchDislikes = async () => {
-  const response = await fetch('http://localhost:8000/dislikes.php');
-  const dislikes = await response.json();
-  return dislikes;
+
+const renderReactBtns = () => {
+  posts?.forEach((p) => {
+    const likeBtn = document.querySelector(`#${p.postId}like`);
+    const dislikeBtn = document.querySelector(`#${p.postId}dislike`);
+
+    if (likeBtn) likeBtn.innerHTML = `<i class="fa-regular fa-thumbs-up"></i>`;
+    if (dislikeBtn)
+      dislikeBtn.innerHTML = '<i class="fa-regular fa-thumbs-down"></i>';
+  });
+};
+const renderReacts = (reactPosts) => {
+  reactPosts?.forEach((p) => {
+    const Rspan = document.querySelector(
+      `#${p.postId}${p.likes ? 'like' : 'dislike'}`
+    )?.nextElementSibling;
+    if (Rspan) Rspan.innerHTML = p.likes || p.dislikes;
+  });
+};
+
+const changeLikedPostsIcon = async (reacts) => {
+  const promises = [];
+  reacts.forEach((p) => promises.push(isLiked(p.postId)));
+  const results = await Promise.all(promises);
+  const reactedPosts = reacts.filter((l, i) => results[i]);
+  reactedPosts.forEach((p) => {
+    const iconBtn = document.querySelector(
+      `#${p.postId}${p.likes ? 'like' : 'dislike'}`
+    );
+    if (iconBtn)
+      iconBtn.innerHTML = `<i class="fa-solid fa-thumbs-${
+        p.likes ? 'up' : 'down'
+      }"></i>`;
+  });
 };
 
 window.addEventListener('DOMContentLoaded', async (event) => {
   user = JSON.parse(localStorage.getItem('user'));
+  // localStorage.removeItem('searchTerm');
   if (!user && location.href.includes('/index.html'))
     location.href = './login.html';
 
-  if (location.href.includes('/index.html')) {
+  if (
+    location.href.includes('/index.html') ||
+    location.href.includes('/profile.html')
+  ) {
     const response = await fetch('http://localhost:8000/user.php', {
       method: 'POST',
       headers: {
@@ -74,46 +114,16 @@ window.addEventListener('DOMContentLoaded', async (event) => {
       parseInt(loggedinUser.posts) * shareFame +
       parseInt(loggedinUser.likes) * likeFame
     } fame`;
+
     usernameP.innerHTML = loggedinUser.username;
-    likes = await fetchLikes();
-    dislikes = await fetchDislikes();
-    posts?.forEach((p) => {
-      const likeBtn = document.querySelector(`#${p.postId}like`);
-      const dislikeBtn = document.querySelector(`#${p.postId}dislike`);
-      likeBtn.innerHTML = `<i class="fa-regular fa-thumbs-up"></i>`;
-      dislikeBtn.innerHTML = '<i class="fa-regular fa-thumbs-down"></i>';
-    });
-    likes.forEach((l) => {
-      const likesSpan = document.querySelector(
-        `#${l.postId}like`
-      )?.nextElementSibling;
-      if (likesSpan) likesSpan.innerHTML = l.likes;
-    });
-    dislikes.forEach((d) => {
-      const dislikesSpan = document.querySelector(
-        `#${d.postId}dislike`
-      )?.nextElementSibling;
-      if (dislikesSpan) dislikesSpan.innerHTML = d.dislikes;
-    });
 
-    const promisesLiked = [];
-    likes.forEach((l) => promisesLiked.push(isLiked(l.postId)));
-    const resultsLiked = await Promise.all(promisesLiked);
-    const likedPosts = likes.filter((l, i) => resultsLiked[i]);
-    likedPosts.forEach((l) => {
-      const likeBtn = document.querySelector(`#${l.postId}like`);
-      if (likeBtn) likeBtn.innerHTML = `<i class="fa-solid fa-thumbs-up"></i>`;
-    });
-
-    const promisesDisliked = [];
-    dislikes.forEach((d) => promisesDisliked.push(isDisliked(d.postId)));
-    const resultsDisliked = await Promise.all(promisesDisliked);
-    const dislikedPosts = dislikes.filter((l, i) => resultsDisliked[i]);
-    dislikedPosts.forEach((d) => {
-      const dislikeBtn = document.querySelector(`#${d.postId}dislike`);
-      if (dislikeBtn)
-        dislikeBtn.innerHTML = `<i class="fa-solid fa-thumbs-down"></i>`;
-    });
+    likes = await fetchReactions('likes');
+    dislikes = await fetchReactions('dislikes');
+    renderReactBtns();
+    renderReacts(likes);
+    renderReacts(dislikes);
+    changeLikedPostsIcon(likes);
+    changeLikedPostsIcon(dislikes);
   }
 
   if (userDiv) {
@@ -154,10 +164,6 @@ const getPosts = async (searchTerm = '') => {
     throw err;
   }
 };
-{
-  /* <i class="fa-solid fa-user"></i> */
-}
-
 const createPostElem = (post) => {
   const postDiv = document.createElement('div');
   postDiv.className = 'post';
@@ -214,14 +220,12 @@ ${
     <i class="fa-solid fa-trash" ></i> Delete
     </div>
   </div>`;
-
   return postDiv;
 };
 const renderPosts = (posts) => {
   const postsDiv = document.querySelector('.posts');
-  posts?.forEach((post) => postsDiv.append(createPostElem(post)));
+  posts?.forEach((post) => postsDiv?.append(createPostElem(post)));
 };
-
 const deletePost = async (id) => {
   try {
     const response = await fetch('http://localhost:8000/posts.php', {
@@ -249,6 +253,7 @@ const savePost = async (post) => {
       text: postText.value.trim(),
       imageURL: post.imageURL,
     };
+
     if (postBlob) {
       const postImageRef = ref(
         storage,
@@ -459,7 +464,10 @@ const dislikePost = async (id) => {
   }
 };
 window.onload = async () => {
-  if (window.location.href.includes('index.html')) {
+  if (
+    location.href.includes('/index.html') ||
+    location.href.includes('/profile.html')
+  ) {
     const data = await getPosts(localStorage.getItem('searchTerm') || '');
     posts = data;
     // console.log(posts);
@@ -709,6 +717,7 @@ const sharePost = async (e) => {
       username: loggedinUser?.username,
       imageURL: null,
     };
+    // console.log(data);
     if (postBlob) {
       const postImageRef = ref(
         storage,
@@ -737,7 +746,6 @@ const sharePost = async (e) => {
     showAlert(err.message, false);
   }
 };
-
 signup && signup.addEventListener('click', signupUser);
 signin && signin.addEventListener('click', signinUser);
 share && share.addEventListener('click', sharePost);
