@@ -5,8 +5,9 @@ header("Access-Control-Allow-Origin: *");
 header("Access-Control-Allow-Headers: Origin, X-Requested-With, Content-Type, Accept");
 
 
-function getLikes($connection){
-  $result=mysqli_query($connection,"SELECT postId,COUNT(*) as likes FROM likes GROUP BY postId");
+function getReactions($connection){
+  $result=mysqli_query($connection,"SELECT p.postId,(SELECT count(*) FROM likes AS l WHERE l.postId=p.postId) AS likes
+  ,(SELECT count(*) FROM dislikes AS d WHERE d.postId=p.postId) AS dislikes FROM posts AS p ORDER BY p.createdAt DESC");
   $data=array();
   $i=0;
   while($row=mysqli_fetch_assoc($result)){
@@ -15,15 +16,8 @@ function getLikes($connection){
   }
   echo(json_encode($data));
 }
-function removeLike($connection){
-  $data=json_decode(file_get_contents('php://input'));
-  var_dump( $data);
 
-}
-if($_SERVER["REQUEST_METHOD"]=="POST"){
-  removeLike($connection);
-}
 if($_SERVER["REQUEST_METHOD"]=="GET"){
-  getLikes($connection);
+  getReactions($connection);
 }
 

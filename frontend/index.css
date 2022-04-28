@@ -183,7 +183,7 @@ nav {
 .index.main {
   /* border: 1px solid red; */
   border-radius: 8px;
-  width: max(30%, 400px);
+  width: max(35%, 400px);
   height: 100%;
   margin-top: 60px;
   margin-bottom: 0;

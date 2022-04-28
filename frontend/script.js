@@ -46,53 +46,47 @@ function isDescendant(parent, child) {
   return false;
 }
 
-let likes = null;
-let dislikes = null;
-
-const fetchReactions = async (reactName) => {
-  const response = await fetch(`http://localhost:8000/${reactName}.php`);
+const getReactions = async () => {
+  const response = await fetch('http://localhost:8000/getReactions.php');
   const reacts = await response.json();
   return reacts;
 };
 
-const renderReactBtns = () => {
-  posts?.forEach((p) => {
-    const likeBtn = document.querySelector(`#${p.postId}like`);
-    const dislikeBtn = document.querySelector(`#${p.postId}dislike`);
-
-    if (likeBtn) likeBtn.innerHTML = `<i class="fa-regular fa-thumbs-up"></i>`;
-    if (dislikeBtn)
-      dislikeBtn.innerHTML = '<i class="fa-regular fa-thumbs-down"></i>';
-  });
-};
 const renderReacts = (reactPosts) => {
   reactPosts?.forEach((p) => {
-    const Rspan = document.querySelector(
-      `#${p.postId}${p.likes ? 'like' : 'dislike'}`
+    const lSpan = document.querySelector(
+      `#${p.postId}like`
     )?.nextElementSibling;
-    if (Rspan) Rspan.innerHTML = p.likes || p.dislikes;
+    const dSpan = document.querySelector(
+      `#${p.postId}dislike`
+    )?.nextElementSibling;
+    if (lSpan) lSpan.innerHTML = p.likes;
+    if (dSpan) dSpan.innerHTML = p.dislikes;
   });
 };
 
-const changeLikedPostsIcon = async (reacts) => {
-  const promises = [];
-  reacts.forEach((p) => promises.push(isLiked(p.postId)));
-  const results = await Promise.all(promises);
-  const reactedPosts = reacts.filter((l, i) => results[i]);
-  reactedPosts.forEach((p) => {
-    const iconBtn = document.querySelector(
-      `#${p.postId}${p.likes ? 'like' : 'dislike'}`
-    );
-    if (iconBtn)
-      iconBtn.innerHTML = `<i class="fa-solid fa-thumbs-${
-        p.likes ? 'up' : 'down'
-      }"></i>`;
+const changeLikedPostsIcon = async (posts) => {
+  const promisesLiked = [];
+  const promisesDisliked = [];
+  posts.forEach((p) => promisesLiked.push(isLiked(p.postId)));
+  const resultsLiked = await Promise.all(promisesLiked);
+  const likedPosts = posts.filter((l, i) => resultsLiked[i]);
+  likedPosts.forEach((p) => {
+    const likeBtn = document.querySelector(`#${p.postId}like`);
+    if (likeBtn) likeBtn.innerHTML = `<i class="fa-solid fa-thumbs-up"></i>`;
+  });
+  posts.forEach((p) => promisesDisliked.push(isDisliked(p.postId)));
+  const resultsDisliked = await Promise.all(promisesDisliked);
+  const dislikedPosts = posts.filter((l, i) => resultsDisliked[i]);
+  dislikedPosts.forEach((p) => {
+    const dislikeBtn = document.querySelector(`#${p.postId}dislike`);
+    if (dislikeBtn)
+      dislikeBtn.innerHTML = `<i class="fa-solid fa-thumbs-down"></i>`;
   });
 };
 
 window.addEventListener('DOMContentLoaded', async (event) => {
   user = JSON.parse(localStorage.getItem('user'));
-  // localStorage.removeItem('searchTerm');
   if (!user && location.href.includes('/index.html'))
     location.href = './login.html';
 
@@ -114,16 +108,10 @@ window.addEventListener('DOMContentLoaded', async (event) => {
       parseInt(loggedinUser.posts) * shareFame +
       parseInt(loggedinUser.likes) * likeFame
     } fame`;
-
     usernameP.innerHTML = loggedinUser.username;
-
-    likes = await fetchReactions('likes');
-    dislikes = await fetchReactions('dislikes');
-    renderReactBtns();
-    renderReacts(likes);
-    renderReacts(dislikes);
-    changeLikedPostsIcon(likes);
-    changeLikedPostsIcon(dislikes);
+    let postsReacts = await getReactions();
+    renderReacts(postsReacts);
+    await changeLikedPostsIcon(postsReacts);
   }
 
   if (userDiv) {
@@ -200,16 +188,18 @@ ${
 <div class="social">
   <div class="social-icon">
     <button type="button" class="social-btn like"  id="${post.postId}like">
+    <i class="fa-regular fa-thumbs-up"></i>
     </button>
-    <span class="likes" id="${post.postId}">0</span>
+    <span class="postsLiked" id="${post.postId}">0</span>
   </div>
 
   <div class="social-icon">
     <button type="button" class="social-btn  dislike" id="${
       post.postId
     }dislike">
+    <i class="fa-regular fa-thumbs-down"></i>
     </button>
-    <span class="dislikes" id="${post.postId}">0</span>
+    <span class="postsDisliked" id="${post.postId}">0</span>
   </div>
 </div>
 <div class="post-dropdown">
@@ -236,7 +226,6 @@ const deletePost = async (id) => {
       body: id,
     });
     const resp = await response.text();
-    // console.log(resp);
     showAlert('Deleted', true);
     setTimeout(() => {
       location.reload();
@@ -472,16 +461,16 @@ window.onload = async () => {
     posts = data;
     // console.log(posts);
     renderPosts(posts);
-    const likes = document.querySelectorAll('.like');
-    const dislikes = document.querySelectorAll('.dislike');
-    for (let i = 0; i < likes.length; i++) {
-      likes[i].addEventListener('click', (e) => {
-        likePost(likes[i].id.replace('like', ''));
+    const postsLiked = document.querySelectorAll('.like');
+    const postsDisliked = document.querySelectorAll('.dislike');
+    for (let i = 0; i < postsLiked.length; i++) {
+      postsLiked[i].addEventListener('click', (e) => {
+        likePost(postsLiked[i].id.replace('like', ''));
       });
     }
-    for (let i = 0; i < dislikes.length; i++) {
-      dislikes[i].addEventListener('click', (e) => {
-        dislikePost(dislikes[i].id.replace('dislike', ''));
+    for (let i = 0; i < postsDisliked.length; i++) {
+      postsDisliked[i].addEventListener('click', (e) => {
+        dislikePost(postsDisliked[i].id.replace('dislike', ''));
       });
     }
     const trash = document.querySelectorAll('.trash');

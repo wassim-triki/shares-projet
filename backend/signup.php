@@ -12,14 +12,6 @@ function signup($connection){
   $result =mysqli_query($connection,"SELECT * FROM users WHERE username='$data->username'");
   if($result->num_rows<1){
     $result=mysqli_query($connection,"INSERT INTO users (username, password, profilePicURL) VALUES ('$data->username','$data->password','$data->profilePicURL')");
-    if($result){
-      // echo "Sign up Seccessful";
-    }else{
-      header('HTTP/1.1 500 Internal Server Error');
-      header('Content-Type: application/json; charset=UTF-8');
-      die(json_encode(array('message' => 'Internal Server Error', 'code' => 1337)));
-    }
-
   }else{
     header('HTTP/1.1 300 Internal Server Error');
       header('Content-Type: application/json; charset=UTF-8');
